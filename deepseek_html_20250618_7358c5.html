@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Soap Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbc;
+            --accent: #ff9800;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --border: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .lang-switch {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .lang-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--light);
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .lang-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-title {
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            color: var(--primary);
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 1.05rem;
+            background: var(--light);
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+        }
+        
+        .input-unit {
+            position: relative;
+        }
+        
+        .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-weight: 500;
+            pointer-events: none;
+        }
+        
+        .oil-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .oil-select {
+            flex: 2;
+        }
+        
+        .oil-amount {
+            flex: 1;
+        }
+        
+        .oil-actions {
+            flex: 0.3;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .oil-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--light);
+            color: var(--dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+        
+        .oil-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: #3a5a8a;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(74, 111, 165, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--dark);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            font-size: 1.1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .quality-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .quality-item {
+            background: white;
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .quality-label {
+            font-size: 1.1rem;
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .quality-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 5px 0;
+            text-align: center;
+        }
+        
+        .quality-bar {
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+        
+        .quality-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 5px;
+        }
+        
+        .math-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .math-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .math-content {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+        
+        .oil-badge {
+            display: inline-block;
+            background: var(--light);
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin: 0 5px;
+            font-weight: 500;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #6c757d;
+            font-size: 1rem;
+            margin-top: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            color: #6c757d;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--accent);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 1100px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .results-grid, .quality-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .oil-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+        
+        .urdu {
+            direction: rtl;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1rem;
+        }
+        
+        .bilingual {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .urdu-text {
+            font-weight: normal;
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-soap"></i> <span id="title">Professional Soap Calculator</span></h1>
+            <div class="lang-switch">
+                <button class="lang-btn active" id="enBtn">
+                    <i class="fas fa-language"></i> English
+                </button>
+                <button class="lang-btn" id="urBtn">
+                    <i class="fas fa-language"></i> اردو
+                </button>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <!-- Left Column - Inputs -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-edit"></i> <span id="recipe-title">Recipe Formulation</span></h2>
+                
+                <div class="form-group">
+                    <label class="bilingual">
+                        <span id="oil-weight-label">Total Oil Weight</span>
+                        <span class="urdu-text urdu" id="oil-weight-label-ur">کل تیل کا وزن</span>
+                    </label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="weightUnit" value="grams" checked> 
+                            <span id="grams-label">Grams</span>
+                            <span class="urdu-text urdu" id="grams-label-ur">گرام</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="weightUnit" value="ounces"> 
+                            <span id="ounces-label">Ounces</span>
+                            <span class="urdu-text urdu" id="ounces-label-ur">اونس</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="weightUnit" value="pounds"> 
+                            <span id="pounds-label">Pounds</span>
+                            <span class="urdu-text urdu" id="pounds-label-ur">پاؤنڈ</span>
+                        </label>
+                    </div>
+                    <div class="input-unit" style="margin-top: 15px;">
+                        <input type="number" id="oilTotal" value="1000" min="1">
+                        <span class="unit" id="oilUnit">g</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="bilingual">
+                        <span id="lye-type-label">Lye Type</span>
+                        <span class="urdu-text urdu" id="lye-type-label-ur">لائی کی قسم</span>
+                    </label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="lyeType" value="NaOH" checked> 
+                            <span id="naoh-label">Sodium Hydroxide (NaOH)</span>
+                            <span class="urdu-text urdu" id="naoh-label-ur">سوڈیم ہائیڈرو آکسائیڈ</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="lyeType" value="KOH"> 
+                            <span id="koh-label">Potassium Hydroxide (KOH)</span>
+                            <span class="urdu-text urdu" id="koh-label-ur">پوٹاشیم ہائیڈرو آکسائیڈ</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="bilingual">
+                        <span id="water-label">Water Amount</span>
+                        <span class="urdu-text urdu" id="water-label-ur">پانی کی مقدار</span>
+                    </label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="waterType" value="percent" checked> 
+                            <span id="percent-label">% of Oils</span>
+                            <span class="urdu-text urdu" id="percent-label-ur">تیل کا فیصد</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="waterType" value="ratio"> 
+                            <span id="ratio-label">Water : Lye Ratio</span>
+                            <span class="urdu-text urdu" id="ratio-label-ur">پانی اور لائی کا تناسب</span>
+                        </label>
+                    </div>
+                    <div class="input-unit" style="margin-top: 15px;">
+                        <input type="number" id="waterAmount" value="38" min="1">
+                        <span class="unit" id="waterUnit">%</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="bilingual">
+                        <span id="superfat-label">Superfat</span>
+                        <span class="urdu-text urdu" id="superfat-label-ur">سپر فیٹ</span>
+                    </label>
+                    <div class="input-unit">
+                        <input type="number" id="superfat" value="5" min="0" max="20">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="bilingual">
+                        <span id="fragrance-label">Fragrance</span>
+                        <span class="urdu-text urdu" id="fragrance-label-ur">خوشبو</span>
+                    </label>
+                    <div class="input-unit">
+                        <input type="number" id="fragrance" value="0.7" step="0.1" min="0">
+                        <span class="unit" id="fragrance-unit">oz per lb oils</span>
+                        <span class="urdu-text urdu" id="fragrance-unit-ur">فی پاؤنڈ تیل</span>
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="oils">
+                        <span id="oils-tab">Oils & Fats</span>
+                        <span class="urdu-text urdu" id="oils-tab-ur">تیل اور چکنائیاں</span>
+                    </div>
+                    <div class="tab" data-tab="butters">
+                        <span id="butters-tab">Butters & Waxes</span>
+                        <span class="urdu-text urdu" id="butters-tab-ur">مکھن اور موم</span>
+                    </div>
+                </div>
+                
+                <div class="tab-content active" id="oils-content">
+                    <h3 style="margin-bottom: 15px; color: #495057;">
+                        <span id="select-oils">Select Oils (Max 10)</span>
+                        <span class="urdu-text urdu" id="select-oils-ur">تیل منتخب کریں (زیادہ سے زیادہ 10)</span>
+                    </h3>
+                    <div id="oilContainer">
+                        <!-- Oil rows will be added here -->
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                        <button class="btn btn-secondary" id="addOilBtn">
+                            <i class="fas fa-plus"></i> 
+                            <span id="add-oil-btn">Add Another Oil</span>
+                            <span class="urdu-text urdu" id="add-oil-btn-ur">ایک اور تیل شامل کریں</span>
+                        </button>
+                        <div style="font-weight: 600;">
+                            <span id="total-label">Total:</span> 
+                            <span id="oilTotalPercent">100</span>%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="butters-content">
+                    <div style="text-align: center; padding: 40px 20px; color: #6c757d;">
+                        <i class="fas fa-seedling" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <h3>
+                            <span id="specialty-title">Specialty Butters & Waxes</span>
+                            <span class="urdu-text urdu" id="specialty-title-ur">خصوصی مکھن اور موم</span>
+                        </h3>
+                        <p>
+                            <span id="specialty-desc">Add shea, cocoa, beeswax and other specialty ingredients</span>
+                            <span class="urdu-text urdu" id="specialty-desc-ur">شیاء، کوکو، مکھیوں کا موم اور دیگر خصوصی اجزاء شامل کریں</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="calculateBtn">
+                        <i class="fas fa-calculator"></i> 
+                        <span id="calculate-btn">Calculate Recipe</span>
+                        <span class="urdu-text urdu" id="calculate-btn-ur">نسخہ حساب کریں</span>
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <i class="fas fa-redo"></i> 
+                        <span id="reset-btn">Reset Form</span>
+                        <span class="urdu-text urdu" id="reset-btn-ur">فارم ری سیٹ کریں</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Right Column - Results -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-chart-line"></i> <span id="results-title">Recipe Results</span></h2>
+                
+                <div class="results-grid">
+                    <div class="result-card">
+                        <div class="result-label bilingual">
+                            <span id="lye-result-label">Required Lye</span>
+                            <span class="urdu-text urdu" id="lye-result-label-ur">مطلوبہ لائی</span>
+                        </div>
+                        <div class="result-value" id="lyeResult">0 g</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label bilingual">
+                            <span id="water-result-label">Required Water</span>
+                            <span class="urdu-text urdu" id="water-result-label-ur">مطلوبہ پانی</span>
+                        </div>
+                        <div class="result-value" id="waterResult">0 g</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label bilingual">
+                            <span id="fragrance-result-label">Fragrance Amount</span>
+                            <span class="urdu-text urdu" id="fragrance-result-label-ur">خوشبو کی مقدار</span>
+                        </div>
+                        <div class="result-value" id="fragranceResult">0 oz</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-label bilingual">
+                            <span id="total-result-label">Total Batch Weight</span>
+                            <span class="urdu-text urdu" id="total-result-label-ur">بیچ کا کل وزن</span>
+                        </div>
+                        <div class="result-value" id="totalResult">0 g</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 30px 0 20px; color: var(--primary);">
+                    <span id="qualities-title">Soap Qualities</span>
+                    <span class="urdu-text urdu" id="qualities-title-ur">صابن کی خصوصیات</span>
+                </h3>
+                
+                <div class="quality-grid">
+                    <div class="quality-item">
+                        <div class="quality-label bilingual">
+                            <span id="hardness-label">Hardness</span>
+                            <span class="urdu-text urdu" id="hardness-label-ur">سختی</span>
+                        </div>
+                        <div class="quality-value" id="hardness">0</div>
+                        <div class="quality-bar">
+                            <div class="quality-fill" id="hardness-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="quality-item">
+                        <div class="quality-label bilingual">
+                            <span id="cleansing-label">Cleansing</span>
+                            <span class="urdu-text urdu" id="cleansing-label-ur">صفائی</span>
+                        </div>
+                        <div class="quality-value" id="cleansing">0</div>
+                        <div class="quality-bar">
+                            <div class="quality-fill" id="cleansing-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="quality-item">
+                        <div class="quality-label bilingual">
+                            <span id="conditioning-label">Conditioning</span>
+                            <span class="urdu-text urdu" id="conditioning-label-ur">کنڈیشنگ</span>
+                        </div>
+                        <div class="quality-value" id="conditioning">0</div>
+                        <div class="quality-bar">
+                            <div class="quality-fill" id="conditioning-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="quality-item">
+                        <div class="quality-label bilingual">
+                            <span id="bubbly-label">Bubbly Lather</span>
+                            <span class="urdu-text urdu" id="bubbly-label-ur">بلبلے دار جھاگ</span>
+                        </div>
+                        <div class="quality-value" id="bubbly">0</div>
+                        <div class="quality-bar">
+                            <div class="quality-fill" id="bubbly-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="quality-item">
+                        <div class="quality-label bilingual">
+                            <span id="creamy-label">Creamy Lather</span>
+                            <span class="urdu-text urdu" id="creamy-label-ur">کریمی جھاگ</span>
+                        </div>
+                        <div class="quality-value" id="creamy">0</div>
+                        <div class="quality-bar">
+                            <div class="quality-fill" id="creamy-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="quality-item">
+                        <div class="quality-label bilingual">
+                            <span id="ins-label">INS Value</span>
+                            <span class="urdu-text urdu" id="ins-label-ur">INS ویلیو</span>
+                        </div>
+                        <div class="quality-value" id="ins">0</div>
+                        <div class="quality-bar">
+                            <div class="quality-fill" id="ins-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="quality-item">
+                        <div class="quality-label bilingual">
+                            <span id="iodine-label">Iodine Value</span>
+                            <span class="urdu-text urdu" id="iodine-label-ur">آئیوڈین ویلیو</span>
+                        </div>
+                        <div class="quality-value" id="iodine">0</div>
+                        <div class="quality-bar">
+                            <div class="quality-fill" id="iodine-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="quality-item">
+                        <div class="quality-label bilingual">
+                            <span id="longevity-label">Longevity</span>
+                            <span class="urdu-text urdu" id="longevity-label-ur">پائیداری</span>
+                        </div>
+                        <div class="quality-value" id="longevity">0</div>
+                        <div class="quality-bar">
+                            <div class="quality-fill" id="longevity-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="math-section">
+                    <h3 class="math-title"><i class="fas fa-calculator"></i> <span id="math-title">Lye Calculation Details</span></h3>
+                    <div class="math-content" id="mathDetails">
+                        <span id="math-placeholder">Select oils and click "Calculate Recipe" to see detailed calculations</span>
+                        <span class="urdu-text urdu" id="math-placeholder-ur">تیل منتخب کریں اور تفصیلی حساب کتاب دیکھنے کے لیے "نسخہ حساب کریں" پر کلک کریں</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>
+                <span id="footer-text">Professional Soap Calculator &copy; 2023 | Chemistry-based calculations for perfect cold process soap</span>
+                <span class="urdu-text urdu" id="footer-text-ur">پیشہ ورانہ صابن کیلکولیٹر © 2023 | بہترین کولڈ پروسیس صابن کے لیے کیمسٹری پر مبنی حساب کتاب</span>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Comprehensive oil database with 50+ entries and real SAP values
+        const oils = [
+            {name: "Olive Oil", naoh: 0.134, koh: 0.188, lauric: 0, myristic: 0, palmitic: 14, stearic: 3, ricinoleic: 0, oleic: 71, linoleic: 10, linolenic: 1},
+            {name: "Coconut Oil", naoh: 0.178, koh: 0.250, lauric: 48, myristic: 18, palmitic: 9, stearic: 3, ricinoleic: 0, oleic: 8, linoleic: 2, linolenic: 0},
+            {name: "Palm Oil", naoh: 0.141, koh: 0.198, lauric: 0, myristic: 1, palmitic: 44, stearic: 5, ricinoleic: 0, oleic: 39, linoleic: 10, linolenic: 0},
+            {name: "Palm Kernel Oil", naoh: 0.156, koh: 0.219, lauric: 48, myristic: 16, palmitic: 8, stearic: 2, ricinoleic: 0, oleic: 15, linoleic: 2, linolenic: 0},
+            {name: "Sunflower Oil", naoh: 0.134, koh: 0.188, lauric: 0, myristic: 0, palmitic: 7, stearic: 5, ricinoleic: 0, oleic: 19, linoleic: 68, linolenic: 1},
+            {name: "Soybean Oil", naoh: 0.135, koh: 0.190, lauric: 0, myristic: 0, palmitic: 11, stearic: 4, ricinoleic: 0, oleic: 24, linoleic: 54, linolenic: 7},
+            {name: "Canola Oil", naoh: 0.124, koh: 0.174, lauric: 0, myristic: 0, palmitic: 4, stearic: 2, ricinoleic: 0, oleic: 62, linoleic: 22, linolenic: 10},
+            {name: "Castor Oil", naoh: 0.128, koh: 0.179, lauric: 0, myristic: 0, palmitic: 2, stearic: 2, ricinoleic: 90, oleic: 4, linoleic: 4, linolenic: 0},
+            {name: "Avocado Oil", naoh: 0.134, koh: 0.188, lauric: 0, myristic: 0, palmitic: 20, stearic: 2, ricinoleic: 0, oleic: 60, linoleic: 12, linolenic: 1},
+            {name: "Sweet Almond Oil", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 7, stearic: 2, ricinoleic: 0, oleic: 66, linoleic: 22, linolenic: 0},
+            {name: "Grapeseed Oil", naoh: 0.126, koh: 0.177, lauric: 0, myristic: 0, palmitic: 8, stearic: 4, ricinoleic: 0, oleic: 22, linoleic: 66, linolenic: 0},
+            {name: "Jojoba Oil", naoh: 0.069, koh: 0.097, lauric: 0, myristic: 0, palmitic: 3, stearic: 1, ricinoleic: 0, oleic: 12, linoleic: 74, linolenic: 0},
+            {name: "Hemp Seed Oil", naoh: 0.135, koh: 0.190, lauric: 0, myristic: 0, palmitic: 6, stearic: 3, ricinoleic: 0, oleic: 12, linoleic: 57, linolenic: 20},
+            {name: "Rice Bran Oil", naoh: 0.128, koh: 0.180, lauric: 0, myristic: 0, palmitic: 15, stearic: 2, ricinoleic: 0, oleic: 43, linoleic: 33, linolenic: 1},
+            {name: "Sesame Oil", naoh: 0.133, koh: 0.187, lauric: 0, myristic: 0, palmitic: 9, stearic: 6, ricinoleic: 0, oleic: 41, linoleic: 44, linolenic: 0},
+            {name: "Apricot Kernel Oil", naoh: 0.135, koh: 0.190, lauric: 0, myristic: 0, palmitic: 6, stearic: 1, ricinoleic: 0, oleic: 60, linoleic: 30, linolenic: 0},
+            {name: "Peanut Oil", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 11, stearic: 2, ricinoleic: 0, oleic: 48, linoleic: 32, linolenic: 0},
+            {name: "Hazelnut Oil", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 5, stearic: 2, ricinoleic: 0, oleic: 78, linoleic: 10, linolenic: 0},
+            {name: "Macadamia Nut Oil", naoh: 0.139, koh: 0.195, lauric: 0, myristic: 0, palmitic: 9, stearic: 5, ricinoleic: 0, oleic: 60, linoleic: 2, linolenic: 2},
+            {name: "Neem Oil", naoh: 0.139, koh: 0.195, lauric: 0, myristic: 0, palmitic: 16, stearic: 19, ricinoleic: 0, oleic: 53, linoleic: 12, linolenic: 0},
+            {name: "Karanja Oil", naoh: 0.138, koh: 0.194, lauric: 0, myristic: 0, palmitic: 11, stearic: 7, ricinoleic: 0, oleic: 51, linoleic: 16, linolenic: 0},
+            {name: "Babassu Oil", naoh: 0.175, koh: 0.246, lauric: 50, myristic: 20, palmitic: 11, stearic: 4, ricinoleic: 0, oleic: 10, linoleic: 2, linolenic: 0},
+            {name: "Mango Butter", naoh: 0.137, koh: 0.192, lauric: 0, myristic: 0, palmitic: 6, stearic: 40, ricinoleic: 0, oleic: 46, linoleic: 3, linolenic: 0},
+            {name: "Shea Butter", naoh: 0.128, koh: 0.179, lauric: 0, myristic: 0, palmitic: 5, stearic: 41, ricinoleic: 0, oleic: 46, linoleic: 7, linolenic: 0},
+            {name: "Cocoa Butter", naoh: 0.137, koh: 0.192, lauric: 0, myristic: 0, palmitic: 26, stearic: 34, ricinoleic: 0, oleic: 35, linoleic: 3, linolenic: 0},
+            {name: "Coffee Butter", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 38, stearic: 8, ricinoleic: 0, oleic: 9, linoleic: 43, linolenic: 0},
+            {name: "Aloe Butter", naoh: 0.139, koh: 0.195, lauric: 0, myristic: 0, palmitic: 15, stearic: 5, ricinoleic: 0, oleic: 50, linoleic: 25, linolenic: 0},
+            {name: "Kokum Butter", naoh: 0.140, koh: 0.196, lauric: 0, myristic: 0, palmitic: 4, stearic: 57, ricinoleic: 0, oleic: 38, linoleic: 1, linolenic: 0},
+            {name: "Illipe Butter", naoh: 0.140, koh: 0.196, lauric: 0, myristic: 0, palmitic: 18, stearic: 46, ricinoleic: 0, oleic: 35, linoleic: 1, linolenic: 0},
+            {name: "Sal Butter", naoh: 0.138, koh: 0.194, lauric: 0, myristic: 0, palmitic: 6, stearic: 39, ricinoleic: 0, oleic: 45, linoleic: 8, linolenic: 0},
+            {name: "Tucuma Butter", naoh: 0.176, koh: 0.247, lauric: 45, myristic: 25, palmitic: 7, stearic: 3, ricinoleic: 0, oleic: 15, linoleic: 2, linolenic: 0},
+            {name: "Cupuacu Butter", naoh: 0.142, koh: 0.199, lauric: 0, myristic: 0, palmitic: 8, stearic: 36, ricinoleic: 0, oleic: 45, linoleic: 4, linolenic: 0},
+            {name: "Mowrah Butter", naoh: 0.135, koh: 0.189, lauric: 0, myristic: 0, palmitic: 28, stearic: 14, ricinoleic: 0, oleic: 40, linoleic: 14, linolenic: 0},
+            {name: "Beeswax", naoh: 0.069, koh: 0.097, lauric: 0, myristic: 0, palmitic: 0, stearic: 0, ricinoleic: 0, oleic: 0, linoleic: 0, linolenic: 0},
+            {name: "Lard", naoh: 0.138, koh: 0.194, lauric: 0, myristic: 1, palmitic: 26, stearic: 14, ricinoleic: 0, oleic: 47, linoleic: 9, linolenic: 1},
+            {name: "Tallow", naoh: 0.140, koh: 0.196, lauric: 0, myristic: 3, palmitic: 24, stearic: 19, ricinoleic: 0, oleic: 43, linoleic: 3, linolenic: 1},
+            {name: "Emu Oil", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 20, stearic: 8, ricinoleic: 0, oleic: 47, linoleic: 15, linolenic: 0},
+            {name: "Evening Primrose", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 6, stearic: 2, ricinoleic: 0, oleic: 9, linoleic: 73, linolenic: 9},
+            {name: "Borage Oil", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 10, stearic: 4, ricinoleic: 0, oleic: 16, linoleic: 38, linolenic: 25},
+            {name: "Camellia Oil", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 9, stearic: 3, ricinoleic: 0, oleic: 84, linoleic: 4, linolenic: 0},
+            {name: "Pomegranate Oil", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 4, stearic: 2, ricinoleic: 0, oleic: 7, linoleic: 7, linolenic: 75},
+            {name: "Rosehip Oil", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 4, stearic: 2, ricinoleic: 0, oleic: 14, linoleic: 44, linolenic: 33},
+            {name: "Sea Buckthorn", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 30, stearic: 1, ricinoleic: 0, oleic: 30, linoleic: 10, linolenic: 25},
+            {name: "Black Cumin", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 13, stearic: 3, ricinoleic: 0, oleic: 24, linoleic: 57, linolenic: 1},
+            {name: "Watermelon Seed", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 11, stearic: 7, ricinoleic: 0, oleic: 15, linoleic: 64, linolenic: 1},
+            {name: "Cranberry Seed", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 6, stearic: 2, ricinoleic: 0, oleic: 22, linoleic: 36, linolenic: 33},
+            {name: "Pumpkin Seed", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 13, stearic: 6, ricinoleic: 0, oleic: 33, linoleic: 47, linolenic: 0},
+            {name: "Cottonseed Oil", naoh: 0.138, koh: 0.194, lauric: 0, myristic: 0, palmitic: 22, stearic: 3, ricinoleic: 0, oleic: 19, linoleic: 54, linolenic: 0},
+            {name: "Flaxseed Oil", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 6, stearic: 3, ricinoleic: 0, oleic: 20, linoleic: 14, linolenic: 57},
+            {name: "Argan Oil", naoh: 0.136, koh: 0.191, lauric: 0, myristic: 0, palmitic: 12, stearic: 6, ricinoleic: 0, oleic: 46, linoleic: 34, linolenic: 0},
+            {name: "Meadowfoam Oil", naoh: 0.120, koh: 0.168, lauric: 0, myristic: 0, palmitic: 1, stearic: 1, ricinoleic: 0, oleic: 2, linoleic: 0, linolenic: 0}
+        ];
+
+        // Initialize the calculator
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add first oil row
+            addOilRow();
+            
+            // Set up unit toggles
+            document.querySelectorAll('input[name="weightUnit"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.getElementById('oilUnit').textContent = 
+                        this.value === 'grams' ? 'g' : 
+                        this.value === 'ounces' ? 'oz' : 'lb';
+                });
+            });
+            
+            document.querySelectorAll('input[name="waterType"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.getElementById('waterUnit').textContent = 
+                        this.value === 'percent' ? '%' : ':1';
+                });
+            });
+            
+            // Set up tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(`${this.dataset.tab}-content`).classList.add('active');
+                });
+            });
+            
+            // Add oil row button
+            document.getElementById('addOilBtn').addEventListener('click', addOilRow);
+            
+            // Calculate button
+            document.getElementById('calculateBtn').addEventListener('click', calculateRecipe);
+            
+            // Reset button
+            document.getElementById('resetBtn').addEventListener('click', resetForm);
+            
+            // Language switching
+            document.getElementById('enBtn').addEventListener('click', function() {
+                this.classList.add('active');
+                document.getElementById('urBtn').classList.remove('active');
+                setLanguage('en');
+            });
+            
+            document.getElementById('urBtn').addEventListener('click', function() {
+                this.classList.add('active');
+                document.getElementById('enBtn').classList.remove('active');
+                setLanguage('ur');
+            });
+        });
+
+        // Set language
+        function setLanguage(lang) {
+            const elements = document.querySelectorAll('.urdu-text');
+            
+            if (lang === 'en') {
+                elements.forEach(el => el.style.display = 'block');
+                document.querySelectorAll('.urdu').forEach(el => {
+                    el.style.direction = 'ltr';
+                    el.style.textAlign = 'left';
+                });
+            } else {
+                elements.forEach(el => el.style.display = 'block');
+                document.querySelectorAll('.urdu').forEach(el => {
+                    el.style.direction = 'rtl';
+                    el.style.textAlign = 'right';
+                });
+            }
+        }
+
+        // Add a new oil row to the form
+        function addOilRow() {
+            const container = document.getElementById('oilContainer');
+            const rowCount = container.children.length;
+            
+            if (rowCount >= 10) {
+                alert('Maximum of 10 oils reached');
+                return;
+            }
+            
+            const row = document.createElement('div');
+            row.className = 'oil-row';
+            row.innerHTML = `
+                <div class="oil-select">
+                    <select>
+                        <option value="">Select Oil</option>
+                        ${oils.map(oil => `<option value="${oil.name}">${oil.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="oil-amount">
+                    <div class="input-unit">
+                        <input type="number" placeholder="%" min="0" value="${rowCount === 0 ? 100 : ''}">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+                <div class="oil-actions">
+                    <button class="oil-btn remove-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(row);
+            
+            // Add event listener for remove button
+            const removeBtn = row.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', function() {
+                if (container.children.length > 1) {
+                    row.remove();
+                    updateOilTotal();
+                }
+            });
+            
+            // Add event listeners to update totals
+            const select = row.querySelector('select');
+            select.addEventListener('change', updateOilTotal);
+            
+            const input = row.querySelector('input');
+            input.addEventListener('input', updateOilTotal);
+            
+            updateOilTotal();
+        }
+
+        // Update the oil total percentage
+        function updateOilTotal() {
+            const rows = document.querySelectorAll('.oil-row');
+            let total = 0;
+            
+            rows.forEach(row => {
+                const input = row.querySelector('input');
+                if (input && input.value) {
+                    total += parseFloat(input.value) || 0;
+                }
+            });
+            
+            document.getElementById('oilTotalPercent').textContent = total.toFixed(1);
+        }
+
+        // Calculate recipe
+        function calculateRecipe() {
+            const oilTotal = parseFloat(document.getElementById('oilTotal').value) || 1000;
+            const superfat = parseFloat(document.getElementById('superfat').value) || 5;
+            const waterAmount = parseFloat(document.getElementById('waterAmount').value) || 38;
+            const lyeType = document.querySelector('input[name="lyeType"]:checked').value;
+            const waterType = document.querySelector('input[name="waterType"]:checked').value;
+            const fragrance = parseFloat(document.getElementById('fragrance').value) || 0.7;
+            
+            // Get oil rows
+            const oilRows = document.querySelectorAll('.oil-row');
+            let totalPercentage = 0;
+            let lyeTotal = 0;
+            let mathDetails = [];
+            
+            // Reset fatty acid profile
+            let fattyAcidProfile = {
+                lauric: 0,
+                myristic: 0,
+                palmitic: 0,
+                stearic: 0,
+                ricinoleic: 0,
+                oleic: 0,
+                linoleic: 0,
+                linolenic: 0
+            };
+            
+            // Calculate for each oil
+            oilRows.forEach(row => {
+                const select = row.querySelector('select');
+                const input = row.querySelector('input');
+                const percentage = parseFloat(input.value) || 0;
+                const oilName = select.value;
+                
+                if (oilName && percentage > 0) {
+                    totalPercentage += percentage;
+                    const oil = oils.find(o => o.name === oilName);
+                    
+                    if (oil) {
+                        const oilWeight = (percentage / 100) * oilTotal;
+                        const sapValue = lyeType === 'NaOH' ? oil.naoh : oil.koh;
+                        const oilLye = oilWeight * sapValue;
+                        lyeTotal += oilLye;
+                        
+                        // Add to math details
+                        mathDetails.push(`
+                            <div style="margin-bottom: 15px;">
+                                <strong>${oilName} (${percentage}%):</strong><br>
+                                Weight = ${oilWeight.toFixed(2)}g × SAP ${sapValue} = ${oilLye.toFixed(2)}g
+                            </div>
+                        `);
+                        
+                        // Add to fatty acid profile
+                        for (const acid in oil) {
+                            if (acid in fattyAcidProfile && typeof oil[acid] === 'number') {
+                                fattyAcidProfile[acid] += (oil[acid] * percentage) / 100;
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Adjust for superfat
+            const superfatFactor = (100 - superfat) / 100;
+            const adjustedLye = lyeTotal * superfatFactor;
+            
+            // Calculate water
+            let waterTotal;
+            if (waterType === 'percent') {
+                waterTotal = oilTotal * (waterAmount / 100);
+            } else {
+                waterTotal = adjustedLye * waterAmount;
+            }
+            
+            // Calculate fragrance
+            const oilInPounds = oilTotal / 453.592;
+            const fragranceTotal = oilInPounds * fragrance;
+            
+            // Calculate soap qualities
+            const hardness = Math.min(100, fattyAcidProfile.lauric + fattyAcidProfile.myristic + 
+                                     fattyAcidProfile.palmitic + fattyAcidProfile.stearic);
+            
+            const cleansing = Math.min(100, fattyAcidProfile.lauric + fattyAcidProfile.myristic);
+            
+            const conditioning = Math.min(100, fattyAcidProfile.ricinoleic + fattyAcidProfile.oleic + 
+                                         fattyAcidProfile.linoleic + fattyAcidProfile.linolenic);
+            
+            const bubbly = Math.min(100, fattyAcidProfile.lauric + fattyAcidProfile.myristic + 
+                                   (fattyAcidProfile.ricinoleic * 0.5));
+            
+            const creamy = Math.min(100, fattyAcidProfile.palmitic + fattyAcidProfile.stearic + 
+                                  (fattyAcidProfile.ricinoleic * 0.5));
+            
+            const iodine = (fattyAcidProfile.oleic * 0.86) + (fattyAcidProfile.linoleic * 1.732) + 
+                          (fattyAcidProfile.linolenic * 2.616) + (fattyAcidProfile.ricinoleic * 0.86);
+            
+            const ins = 120 - iodine;
+            const longevity = Math.min(100, fattyAcidProfile.palmitic + fattyAcidProfile.stearic);
+            
+            // Update results
+            document.getElementById('lyeResult').textContent = adjustedLye.toFixed(2) + ' g';
+            document.getElementById('waterResult').textContent = waterTotal.toFixed(2) + ' g';
+            document.getElementById('fragranceResult').textContent = fragranceTotal.toFixed(2) + ' oz';
+            document.getElementById('totalResult').textContent = (oilTotal + adjustedLye + waterTotal).toFixed(2) + ' g';
+            
+            // Update soap qualities
+            document.getElementById('hardness').textContent = Math.round(hardness);
+            document.getElementById('hardness-bar').style.width = hardness + '%';
+            
+            document.getElementById('cleansing').textContent = Math.round(cleansing);
+            document.getElementById('cleansing-bar').style.width = cleansing + '%';
+            
+            document.getElementById('conditioning').textContent = Math.round(conditioning);
+            document.getElementById('conditioning-bar').style.width = conditioning + '%';
+            
+            document.getElementById('bubbly').textContent = Math.round(bubbly);
+            document.getElementById('bubbly-bar').style.width = bubbly + '%';
+            
+            document.getElementById('creamy').textContent = Math.round(creamy);
+            document.getElementById('creamy-bar').style.width = creamy + '%';
+            
+            document.getElementById('ins').textContent = Math.round(ins);
+            document.getElementById('ins-bar').style.width = Math.max(0, Math.min(100, ins)) + '%';
+            
+            document.getElementById('iodine').textContent = Math.round(iodine);
+            document.getElementById('iodine-bar').style.width = Math.max(0, Math.min(100, iodine)) + '%';
+            
+            document.getElementById('longevity').textContent = Math.round(longevity);
+            document.getElementById('longevity-bar').style.width = longevity + '%';
+            
+            // Update math details
+            mathDetails.unshift(`
+                <div style="margin-bottom: 20px; font-weight: bold;">
+                    Total Lye Before Superfat: ${lyeTotal.toFixed(2)}g
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Superfat Adjustment (${superfat}%):</strong><br>
+                    ${lyeTotal.toFixed(2)}g × ${superfatFactor} = ${adjustedLye.toFixed(2)}g
+                </div>
+            `);
+            
+            document.getElementById('mathDetails').innerHTML = mathDetails.join('');
+            
+            // Check percentages
+            if (Math.abs(totalPercentage - 100) > 0.1) {
+                alert(`Warning: Oil percentages total ${totalPercentage.toFixed(1)}% (should be 100%)`);
+            }
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('oilTotal').value = '1000';
+            document.getElementById('superfat').value = '5';
+            document.getElementById('waterAmount').value = '38';
+            document.getElementById('fragrance').value = '0.7';
+            
+            // Reset oil rows
+            const container = document.getElementById('oilContainer');
+            container.innerHTML = '';
+            addOilRow();
+            
+            // Reset results
+            document.getElementById('lyeResult').textContent = '0 g';
+            document.getElementById('waterResult').textContent = '0 g';
+            document.getElementById('fragranceResult').textContent = '0 oz';
+            document.getElementById('totalResult').textContent = '0 g';
+            
+            // Reset qualities
+            document.getElementById('mathDetails').innerHTML = `
+                <span id="math-placeholder">Select oils and click "Calculate Recipe" to see detailed calculations</span>
+                <span class="urdu-text urdu" id="math-placeholder-ur">تیل منتخب کریں اور تفصیلی حساب کتاب دیکھنے کے لیے "نسخہ حساب کریں" پر کلک کریں</span>
+            `;
+            ['hardness', 'cleansing', 'conditioning', 'bubbly', 'creamy', 'ins', 'iodine', 'longevity'].forEach(id => {
+                document.getElementById(id).textContent = '0';
+                document.getElementById(`${id}-bar`).style.width = '0%';
+            });
+        }
+    </script>
+</body>
+</html>
